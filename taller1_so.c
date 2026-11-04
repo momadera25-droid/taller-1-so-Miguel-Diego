@@ -17,10 +17,9 @@ sem_t semB_C; // Notifica a C que B escribió Cifra 2
 
 // --- INTEGRANTE 1: Hilo A ---
 void* HiloA(void* arg) {
-    printf("[Hilo A Dev: Diego] Iniciando... \n");
     int cifra_a = 15;
 
-    printf("[Hilo A Dev: Miguel Madera] Paso 1: Iniciando...\n");
+    printf("[Hilo A Dev: Miguel Madera] Iniciando...\n");
 
     // Proteger escritura con Mutex e inicializar variable compartida
     pthread_mutex_lock(&mutex_variable);
