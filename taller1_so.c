@@ -19,12 +19,15 @@ sem_t semB_C; // Notifica a C que B escribió Cifra 2
 void* HiloA(void* arg) {
     printf("[Hilo A Dev: Diego] Iniciando... \n");
     int cifra_a = 15;
-        // TO-DO Proteger escritura con Mutex e inicializar variable compartida
+
+    printf("[Hilo A Dev: Miguel Madera] Paso 1: Iniciando...\n");
+
+    // Proteger escritura con Mutex e inicializar variable compartida
     pthread_mutex_lock(&mutex_variable);
     variable_compartida = cifra_a;
     pthread_mutex_unlock(&mutex_variable);
-    
-    // TO-DO Notificar a Hilo C
+
+    // Notificar a Hilo C
     sem_post(&semA_C);
     return NULL;
 }
@@ -34,35 +37,35 @@ void* HiloB(void* arg) {
     printf("[Hilo B Dev: Diego] Iniciando... \n");
     int cifra_b = 25;
     
-    // TO-DO Esperar a que Hilo C haya leído Cifra 1 y limpiado la variable
+    // Esperar a que Hilo C haya leído Cifra 1 y limpiado la variable
     sem_wait(&semC_B);
 
-    // TO-DO Proteger escritura con Mutex y actualizar variable compartida
-   pthread_mutex_lock(&mutex_variable);
-   variable_compartida = cifra_b;
-   pthread_mutex_unlock(&mutex_variable);
+    // Proteger escritura con Mutex y actualizar variable compartida
+    pthread_mutex_lock(&mutex_variable);
+    variable_compartida = cifra_b;
+    pthread_mutex_unlock(&mutex_variable);
     
-    // TO-DO Notificar a Hilo C
-	sem_post(&semB_C);
+    // Notificar a Hilo C
+    sem_post(&semB_C);
     return NULL;
 }
 
-// --- INTEGRANTE 3: Hilo C ---
+// --- INTEGRANTE 2: Hilo C ---
 void* HiloC(void* arg) {
     printf("[Hilo C Dev: Diego] Iniciando... \n");
     int cifra1 = 0, cifra2 = 0;
 
-    // TO-DO --- PARTE 1: Procesar Cifra 1 ---
+    // --- PARTE 1: Procesar Cifra 1 ---
     sem_wait(&semA_C);
     pthread_mutex_lock(&mutex_variable);
     cifra1 = variable_compartida;
     variable_compartida = 0;
     pthread_mutex_unlock(&mutex_variable);
 
-    // TO-DO Dar paso a Hilo B
+    // Dar paso a Hilo B
     sem_post(&semC_B);
 
-    // TO-DO --- PARTE 2: Procesar Cifra 2 y Consolidar ---
+    // --- PARTE 2: Procesar Cifra 2 y Consolidar ---
     sem_wait(&semB_C);
     pthread_mutex_lock(&mutex_variable);
     cifra2 = variable_compartida;
@@ -81,7 +84,7 @@ void* HiloC(void* arg) {
 int main(int argc, char *argv[]) {
     pthread_t hA, hB, hC;
 
-    // TO-DO Inicialización de Mutex y Semáforos
+    // Inicialización de Mutex y Semáforos (en 0 para forzar la espera inicial)
     pthread_mutex_init(&mutex_variable, NULL);
     sem_init(&semA_C, 0, 0);
     sem_init(&semC_B, 0, 0);
@@ -89,17 +92,17 @@ int main(int argc, char *argv[]) {
 
     printf("=== INICIO DE LA PRUEBA DE FUEGO ===\n\n");
 
-    // TO-DO Creación de hilos
-    pthread_create(&hC, NULL, HiloC, NULL);
-    pthread_create(&hB, NULL, HiloB, NULL);
+    // Creación de hilos
     pthread_create(&hA, NULL, HiloA, NULL);
+    pthread_create(&hB, NULL, HiloB, NULL);
+    pthread_create(&hC, NULL, HiloC, NULL);
 
-    // TO-DO Esperar a que terminen
+    // Esperar a que terminen
     pthread_join(hA, NULL);
     pthread_join(hB, NULL);
     pthread_join(hC, NULL);
 
-    // TO-DO Destrucción de recursos
+    // Destrucción de recursos
     pthread_mutex_destroy(&mutex_variable);
     sem_destroy(&semA_C);
     sem_destroy(&semC_B);
